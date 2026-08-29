@@ -605,10 +605,20 @@ def validate_corpus_lock(root: Path, report: ValidationReport) -> None:
     expected_paths = set(expected)
     actual_paths = set(actual)
     if expected_paths != actual_paths:
+        missing = sorted(expected_paths - actual_paths)
+        extra = sorted(actual_paths - expected_paths)
+        detail = []
+        if missing:
+            detail.append("expected-not-in-vault: " + ", ".join(missing[:12]))
+        if extra:
+            detail.append("vault-not-in-lock: " + ", ".join(extra[:12]))
+        if len(missing) > 12 or len(extra) > 12:
+            detail.append("(truncated)")
         report.add(
             "corpus_lock_file_set",
             LOCK_PATH,
-            "Locked corpus file set does not match the current 55+40+34 corpus",
+            "Locked corpus file set does not match the current 55+40+34 corpus; "
+            + " | ".join(detail),
         )
 
     for path in sorted(expected_paths & actual_paths):
