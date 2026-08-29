@@ -111,7 +111,7 @@ def build_valid_vault(root: Path) -> None:
     ):
         write_text(root / "炒股实操" / "整理" / name, f"# {name}\n")
 
-    write_corpus_lock(root)
+    write_corpus_lock(root, root / "schema" / "corpus-lock.json")
 
 
 class VaultValidatorTests(unittest.TestCase):
@@ -123,7 +123,7 @@ class VaultValidatorTests(unittest.TestCase):
                 root = Path(directory)
                 build_valid_vault(root)
 
-                report = validate_vault(root)
+                report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
                 self.assertTrue(report.ok, report.format_errors())
                 self.assertEqual(report.stats["articles"], 55)
@@ -138,7 +138,7 @@ class VaultValidatorTests(unittest.TestCase):
             build_valid_vault(root)
             write_text(root / "README.md", "[[missing-page]]\n")
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertIn("broken_wiki_link", report.error_codes)
 
@@ -156,7 +156,7 @@ class VaultValidatorTests(unittest.TestCase):
                 "指向已删除旧索引：[[资料库/文字化索引]] [[资料库/原始资料分类]]\n",
             )
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertTrue(report.ok, report.format_errors())
             self.assertNotIn("broken_wiki_link", report.error_codes)
@@ -175,7 +175,7 @@ class VaultValidatorTests(unittest.TestCase):
                             root / "资料库" / ".ecc" / "backup" / "book.md"):
                 write_text(private, "[[private snapshot, not a published link]]\n")
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertTrue(report.ok, report.format_errors())
 
@@ -188,7 +188,7 @@ class VaultValidatorTests(unittest.TestCase):
             course = root / "大小课" / "课程正文" / "01-course.md"
             write_text(course, course_text(1))
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertIn("missing_course_backlink", report.error_codes)
 
@@ -205,7 +205,7 @@ class VaultValidatorTests(unittest.TestCase):
             )
             write_text(article, changed)
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertIn("corpus_lock_mismatch", report.error_codes)
 
@@ -217,7 +217,7 @@ class VaultValidatorTests(unittest.TestCase):
             build_valid_vault(root)
             (root / "人智55篇" / "正文" / "54-article.md").unlink()
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertIn("article_numbering", report.error_codes)
 
@@ -229,7 +229,7 @@ class VaultValidatorTests(unittest.TestCase):
             build_valid_vault(root)
             (root / "炒股实操" / "课程转写" / "33-practice.md").unlink()
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertIn("practice_numbering", report.error_codes)
 
@@ -249,7 +249,7 @@ class VaultValidatorTests(unittest.TestCase):
                 "[Deleted source](legacy-source.docx)\n",
             )
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertTrue(report.ok, report.format_errors())
 
@@ -262,7 +262,7 @@ class VaultValidatorTests(unittest.TestCase):
             secret = "ghp_" + "A" * 40
             write_text(root / "README.md", f"credential={secret}\n")
 
-            report = validate_vault(root)
+            report = validate_vault(root, root / "schema" / "corpus-lock.json")
 
             self.assertIn("secret_pattern", report.error_codes)
             self.assertNotIn(secret, report.format_errors())

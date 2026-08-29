@@ -561,8 +561,8 @@ def compute_corpus_hashes(root: Path) -> dict[str, str]:
     return hashes
 
 
-def write_corpus_lock(root: Path) -> Path:
-    lock_path = LOCK_PATH
+def write_corpus_lock(root: Path, lock_path: Path | None = None) -> Path:
+    lock_path = lock_path or LOCK_PATH
     lock_path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "version": 2,
@@ -584,20 +584,22 @@ def write_corpus_lock(root: Path) -> Path:
     return lock_path
 
 
-def validate_corpus_lock(root: Path, report: ValidationReport) -> None:
-    lock_path = LOCK_PATH
+def validate_corpus_lock(
+    root: Path, report: ValidationReport, lock_path: Path | None = None
+) -> None:
+    lock_path = lock_path or LOCK_PATH
     if not lock_path.is_file():
-        report.add("corpus_lock_missing", LOCK_PATH, "Corpus lock file is missing")
+        report.add("corpus_lock_missing", lock_path, "Corpus lock file is missing")
         return
     try:
         payload = json.loads(lock_path.read_text(encoding="utf-8"))
     except (OSError, UnicodeError, json.JSONDecodeError) as error:
-        report.add("corpus_lock_invalid", LOCK_PATH, str(error))
+        report.add("corpus_lock_invalid", lock_path, str(error))
         return
 
     expected = payload.get("files")
     if not isinstance(expected, dict):
-        report.add("corpus_lock_invalid", LOCK_PATH, "Missing files mapping")
+        report.add("corpus_lock_invalid", lock_path, "Missing files mapping")
         return
 
     actual = compute_corpus_hashes(root)
@@ -687,13 +689,13 @@ def validate_sensitive_files(root: Path, report: ValidationReport) -> None:
             )
 
 
-def validate_vault(root: Path) -> ValidationReport:
+def validate_vault(root: Path, lock_path: Path | None = None) -> ValidationReport:
     root = root.resolve()
     report = ValidationReport()
     validate_required_files(root, report)
     article_files, course_files, _practice_files = validate_numbered_corpus(root, report)
     validate_links_and_relations(root, article_files, course_files, report)
-    validate_corpus_lock(root, report)
+    validate_corpus_lock(root, report, lock_path)
     validate_sensitive_files(root, report)
     return report
 
