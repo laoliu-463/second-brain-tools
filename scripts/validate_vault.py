@@ -479,6 +479,22 @@ def validate_links_and_relations(
     report.stats["cross_relations"] = len(article_to_course & course_to_article)
 
 
+DERIVED_LAYER_PARTS = {"文字层", "原始资料层"}
+
+
+def is_derived_layer_path(candidate: Path, root: Path) -> bool:
+    """True if the path lives under a gitignored derived layer (文字层/原始资料层).
+
+    These are locally rebuildable OCR layers; CI checkouts do not include them,
+    so links pointing into them must be ignored for consistent local/CI linting.
+    """
+    try:
+        rel = candidate.resolve().relative_to(root.resolve())
+    except ValueError:
+        return False
+    return any(part in DERIVED_LAYER_PARTS for part in rel.parts)
+
+
 def validate_markdown_links(
     root: Path,
     source: Path,
@@ -504,6 +520,10 @@ def validate_markdown_links(
             )
             continue
         if not candidate.exists():
+            # 派生层（gitignore 的「文字层 / 原始资料层」）是本地可重建层，
+            # CI checkout 不含这些文件，本地/CI 行为须一致：不参与断链检查。
+            if is_derived_layer_path(candidate, root):
+                continue
             report.add(
                 "broken_markdown_link",
                 relative_path(root, source),
