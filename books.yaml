@@ -1,0 +1,99 @@
+# OCR 调度 manifest
+# ------------------
+# 两批书合在一个 manifest 里，由 priority 字段决定先后：
+#   priority=10  → 旧 pilot 残留的 4 本（"先旧后新"）
+#   priority=50  → 新的 5 本经济学 / 古本竹书
+# 同 priority 内按 id 字典序
+#
+# mode:
+#   redo  → 已有文本层则替换；没有则加
+#   skip  → 不重做已有文本层，仅扫描
+#   force → 强制覆盖（哪怕已有文本层）
+#
+# pages：书的页数（必须准确，否则 pending 表与真实 PDF 对不上）
+#
+# 实际 PDF 路径（2026-08-25 现场核实）：
+# - 古本竹书纪年译注：在 D盘-raw根目录
+# - 五本经济学：在 D盘-raw根目录（02_经济与金融）
+
+output_dir: D:/第二大脑/ocr-pilot-20260825
+db_path:    D:/第二大脑/ocr-pilot-20260825/ocr_progress.db
+
+books:
+
+  # ===== 旧 pilot 残留 4 本 =====
+  - id: cs_os_自己动手写操作系统
+    title: 自己动手写操作系统
+    source: D:/第二大脑/资料库/原始资料/书籍与讲义/03_计算机与数学/D盘-计算机书籍/自己动手写操作系统.pdf
+    pages: 165
+    mode: redo
+    priority: 10
+    language: chi_sim+eng
+    extra_args: ["--skip-big", "50"]      # 单页 >50MB 图像直接跳过（避免 xref 200 类错误）
+
+  - id: math_rudin_分析原理
+    title: 数学分析原理Rudin着中文版
+    source: D:/第二大脑/资料库/原始资料/书籍与讲义/03_计算机与数学/D盘-计算机书籍/数学分析原理(Rudin_着)中文版.pdf
+    pages: 381
+    mode: redo
+    priority: 10
+    language: chi_sim+eng
+
+  - id: prob_概率导论第2版
+    title: 概率导论第2版
+    source: D:/第二大脑/资料库/原始资料/书籍与讲义/03_计算机与数学/D盘-计算机书籍/概率导论(第2版).pdf
+    pages: 456
+    mode: redo
+    priority: 10
+    language: chi_sim+eng
+
+  - id: algo_intro_第3版
+    title: 算法导论第3版
+    source: D:/第二大脑/资料库/原始资料/书籍与讲义/03_计算机与数学/D盘-计算机书籍/算法导论第三版.pdf
+    pages: 52
+    mode: redo
+    priority: 10
+    language: chi_sim+eng
+
+  # ===== 新一批：5 本经济学 + 古本竹书 =====
+  - id: econ_micro_经济学原理微观
+    title: 经济学原理第7版_微观经济学分册
+    source: D:/第二大脑/资料库/原始资料/书籍与讲义/02_经济与金融/D盘-raw根目录/1_经济学原理第7版微观经济学分册.pdf
+    pages: 577
+    mode: redo
+    priority: 50
+    language: chi_sim+eng
+
+  - id: econ_macro_经济学原理宏观
+    title: 经济学原理第7版_宏观经济学分册
+    source: D:/第二大脑/资料库/原始资料/书籍与讲义/02_经济与金融/D盘-raw根目录/1_经济学原理第7版宏观经济学分册.pdf
+    pages: 406
+    mode: redo
+    priority: 50
+    language: chi_sim+eng
+
+  - id: econ_mankiw_宏观经济学第十版
+    title: 宏观经济学第十版_曼昆
+    # 原文件名末尾看起来像重复了一段（Z-Library 下载产物），按实际字节取整，加引号防特殊字符
+    source: "D:/第二大脑/资料库/原始资料/书籍与讲义/02_经济与金融/D盘-raw根目录/宏观经济学(第十版) (格里高利·曼昆 N.gregory mankiw) (Z-Library).pdf宏观经济学(第十版) (格里高利·曼昆 N.g.pdf"
+    pages: 480
+    mode: force           # 该书已有 OCR PDF，重跑清洗（按用户决定）
+    priority: 50
+    language: chi_sim+eng
+
+  - id: econ_political_马政经济学概论
+    title: 马克思主义政治经济学概论
+    source: D:/第二大脑/资料库/原始资料/书籍与讲义/02_经济与金融/D盘-raw根目录/1_马克思主义政治经济学概论.pdf
+    pages: 444
+    mode: redo
+    priority: 50
+    language: chi_sim+eng
+
+  - id: history_古本竹书纪年译注
+    title: 古本竹书纪年译注
+    source: D:/第二大脑/资料库/原始资料/书籍与讲义/05_历史与社会/D盘-raw根目录/1_古本竹书纪年译注.pdf
+    pages: 348
+    mode: redo
+    priority: 50
+    language: chi_sim+eng
+    enabled: true

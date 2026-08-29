@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# OCR 中间产物（大目录，不进版本控制）
+ocr-output/
+
+# 历史遗留的一次性 OCR 辅助脚本（保留在本地，不进仓库）
+second_brain/
+第二大脑/
+studio/
+
+# 本地私有
+.ecc/
+.env

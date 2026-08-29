@@ -1,0 +1,2 @@
+# Tesseract configuration file
+# Basic configuration to avoid hocr/pdf/txt config errors
