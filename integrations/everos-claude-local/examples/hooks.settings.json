@@ -1,0 +1,37 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"D:/Repositories/second-brain-tools/integrations/everos-claude-local/hooks/recall-everos.py\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"D:/Repositories/second-brain-tools/integrations/everos-claude-local/hooks/stop-everos.py\""
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python \"D:/Repositories/second-brain-tools/integrations/everos-claude-local/hooks/flush-everos.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
