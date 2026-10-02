@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "everos-local": {
+      "command": "wsl",
+      "args": [
+        "-d",
+        "Ubuntu",
+        "python3",
+        "/mnt/d/Repositories/second-brain-tools/integrations/everos-claude-local/mcp/server.py"
+      ],
+      "env": {
+        "EVEROS_BASE_URL": "http://127.0.0.1:8000",
+        "EVEROS_USER_ID": "<YOUR_MEMORY_OWNER_ID>"
+      }
+    }
+  }
+}
